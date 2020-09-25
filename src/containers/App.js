@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import CardList from "./CardList";
-import { robots } from "./robots";
-import SearchBox from "./SearchBox";
-import Scroll from "./Scroll";
-import "./App.css";
+import CardList from "../components/CardList";
+import SearchBox from "../components/SearchBox";
+import Scroll from "../components/Scroll";
+import "../containers/App.css";
 
 const useConstructor = (callBack = () => {}) => {
   const hasBeenCalled = useRef(false);
@@ -13,7 +12,6 @@ const useConstructor = (callBack = () => {}) => {
 };
 
 function App() {
-  //const [searchField, setSearchField] = useState("");
   const [filteredRobots, setFilteredRobots] = useState([]);
   const [bots, setBots] = useState([]);
 
@@ -24,25 +22,24 @@ function App() {
 
   //componentDidMount
   useEffect(() => {
-    async function fetchData(setFilteredRobots) {
-      const users = await (
-        await fetch("https://jsonplaceholder.typicode.com/users")
-      ).json();
-      return setFilteredRobots(users);
-    }
-    setBots(robots);
-
-    fetchData(setFilteredRobots);
-    console.log("componentDidMount");
+    componentDidMount();
   }, []); //notice the empty array here
+
+  async function componentDidMount() {
+    const users = await (
+      await fetch("https://jsonplaceholder.typicode.com/users")
+    ).json();
+    setBots(users);
+    setFilteredRobots(users);
+
+    console.log("componentDidMount");
+  }
 
   function onSearchChange(e) {
     if (e) {
-      //setSearchField(e.target.value);
-
       setFilteredRobots(
-        robots.filter((robots) =>
-          robots.name.toLowerCase().includes(e.target.value.toLowerCase())
+        bots.filter((robot) =>
+          robot.name.toLowerCase().includes(e.target.value.toLowerCase())
         )
       );
     }
@@ -51,7 +48,7 @@ function App() {
   console.log("render");
 
   //tc = text center
-  return bots.length === 0 ? (
+  return !bots.length ? (
     <h1>Loading...</h1>
   ) : (
     <div className="tc">
