@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import CardList from "../components/CardList";
 import SearchBox from "../components/SearchBox";
 import Scroll from "../components/Scroll";
+import ErrorBoundry from "../components/ErrorBoundry";
 import "../containers/App.css";
 
 const useConstructor = (callBack = () => {}) => {
@@ -55,7 +56,9 @@ function App() {
       <h1 className="f2">Robofriends</h1>
       <SearchBox searchChange={onSearchChange} />
       <Scroll>
-        <CardList robots={filteredRobots} />
+        <ErrorBoundry>
+          <CardList robots={filteredRobots} />
+        </ErrorBoundry>
       </Scroll>
     </div>
   );
