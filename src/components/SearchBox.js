@@ -1,6 +1,7 @@
 import React from "react";
 
 const SearchBox = ({ searchField, searchChange }) => {
+  console.log("searchfield");
   //pa = padding, ba = border all sides, b = border, bg = background
   return (
     <div className="pa2">
@@ -14,4 +15,4 @@ const SearchBox = ({ searchField, searchChange }) => {
   );
 };
 
-export default SearchBox;
+export default React.memo(SearchBox);

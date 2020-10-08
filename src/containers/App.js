@@ -1,59 +1,49 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import CardList from "../components/CardList";
 import SearchBox from "../components/SearchBox";
 import Scroll from "../components/Scroll";
 import ErrorBoundry from "../components/ErrorBoundry";
 import "../containers/App.css";
+import { setSearchField, requestRobots } from "../actions";
+import { connect } from "react-redux";
+import Header from "../components/Header";
 
-const useConstructor = (callBack = () => {}) => {
-  const hasBeenCalled = useRef(false);
-  if (hasBeenCalled.current) return;
-  callBack();
-  hasBeenCalled.current = true;
-};
-
-function App() {
+function App(props) {
   const [filteredRobots, setFilteredRobots] = useState([]);
-  const [bots, setBots] = useState([]);
-
-  //Constructor
-  useConstructor(() => {
-    console.log("constructor");
-  });
+  const {
+    searchField,
+    onSearchChange,
+    robots,
+    onRequestRobots,
+    isPending,
+  } = props;
 
   //componentDidMount
   useEffect(() => {
     componentDidMount();
-  }, []); //notice the empty array here
+  }, [robots.length]); //notice the empty array here
 
   async function componentDidMount() {
-    const users = await (
-      await fetch("https://jsonplaceholder.typicode.com/users")
-    ).json();
-    setBots(users);
-    setFilteredRobots(users);
-
-    console.log("componentDidMount");
+    if (robots.length === 0) onRequestRobots();
+    if (robots.length > 0) setFilteredRobots(robots);
   }
 
-  function onSearchChange(e) {
-    if (e) {
+  useEffect(() => {
+    if (robots.length) {
       setFilteredRobots(
-        bots.filter((robot) =>
-          robot.name.toLowerCase().includes(e.target.value.toLowerCase())
+        robots.filter((robot) =>
+          robot.name.toLowerCase().includes(searchField.toLowerCase())
         )
       );
     }
-  }
-
-  console.log("render");
+  }, [searchField.length]);
 
   //tc = text center
-  return !bots.length ? (
+  return isPending ? (
     <h1>Loading...</h1>
   ) : (
     <div className="tc">
-      <h1 className="f2">Robofriends</h1>
+      <Header />
       <SearchBox searchChange={onSearchChange} />
       <Scroll>
         <ErrorBoundry>
@@ -64,4 +54,20 @@ function App() {
   );
 }
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    searchField: state.searchRobots.searchField,
+    robots: state.requestRobots.robots,
+    isPending: state.requestRobots.isPending,
+    error: state.requestRobots.error,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
+    onRequestRobots: () => requestRobots(dispatch),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
